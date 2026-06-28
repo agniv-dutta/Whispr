@@ -1,5 +1,7 @@
 import asyncio
 import datetime
+import logging
+import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -9,6 +11,19 @@ from sqlalchemy import select
 from app.database import engine, Base, async_session
 from app.models import Conversation, Message
 from app.routers import auth, users, chats, conversations, websocket, upload
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
+logger = logging.getLogger("whispr")
+
+SENTRY_DSN = os.getenv("SENTRY_DSN")
+if SENTRY_DSN:
+    import sentry_sdk
+    sentry_sdk.init(
+        dsn=SENTRY_DSN,
+        traces_sample_rate=0.1,
+        environment=os.getenv("ENVIRONMENT", "production"),
+    )
+    logger.info("Sentry initialized")
 
 
 async def delete_expired_messages():
@@ -33,27 +48,30 @@ async def delete_expired_messages():
                         msg.is_deleted = True
                 await db.commit()
         except Exception:
-            pass
+            logger.exception("Error in delete_expired_messages")
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
+    logger.info("Database tables created")
     task = asyncio.create_task(delete_expired_messages())
     yield
     task.cancel()
+    logger.info("Shutting down")
 
+
+CORS_ORIGINS = os.getenv(
+    "CORS_ORIGINS",
+    "http://localhost:3000,https://whispr.vercel.app,https://whispr-backend.onrender.com",
+).split(",")
 
 app = FastAPI(title="Whispr API", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "https://whispr.vercel.app",
-        "https://whispr-backend.onrender.com",
-    ],
+    allow_origins=[o.strip() for o in CORS_ORIGINS],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -66,8 +84,14 @@ app.include_router(conversations.router, prefix="/api/conversations", tags=["con
 app.include_router(websocket.router, tags=["websocket"])
 app.include_router(upload.router, prefix="/api", tags=["upload"])
 
-import os
 os.makedirs("uploads/avatars", exist_ok=True)
 os.makedirs("static/uploads", exist_ok=True)
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+logger.info("Whispr API started")
+
+
+@app.get("/health")
+async def health():
+    return {"status": "ok"}

@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import apiClient from '@/lib/api';
 import { useAuthStore } from '@/lib/auth';
 import type { User as AuthUser } from '@/lib/auth';
+import { useAnalytics } from '@/lib/analytics';
 import { cn } from '@/lib/utils';
 import { ArrowLeft, Lock, Shield, Zap, Download } from 'lucide-react';
 
@@ -15,6 +16,7 @@ export default function LoginPage() {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [step, setStep] = useState<'phone' | 'otp'>('phone');
   const [loading, setLoading] = useState(false);
+  const { trackLogin } = useAnalytics();
   const [error, setError] = useState('');
   
   const otpRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -43,6 +45,7 @@ export default function LoginPage() {
       const res = await apiClient.post('/auth/login', { phone: `+91${phone.replace(/\D/g, '')}`, otp: code });
       setToken(res.data.access_token);
       setUser(res.data.user as AuthUser);
+      trackLogin();
       router.push('/');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Invalid OTP');
@@ -254,6 +257,13 @@ export default function LoginPage() {
           <p className="text-[10px] font-mono tracking-widest text-neutral-400 uppercase">
             WHISPR_PROTOCOL_v4.2
           </p>
+          <div className="mt-3 flex items-center gap-4 text-[10px] text-neutral-500">
+            <span>5M+ users</span>
+            <span className="w-1 h-1 rounded-full bg-neutral-600" />
+            <span>2B+ messages daily</span>
+            <span className="w-1 h-1 rounded-full bg-neutral-600" />
+            <span>99.9% uptime</span>
+          </div>
         </div>
       )}
     </div>

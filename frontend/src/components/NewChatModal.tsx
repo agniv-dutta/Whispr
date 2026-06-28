@@ -8,6 +8,7 @@ import type { UserPublic } from "@/lib/types";
 import { getInitials } from "@/lib/format";
 import { toastError } from "@/lib/toast";
 import { cn } from "@/lib/utils";
+import { useAnalytics } from "@/lib/analytics";
 
 interface Props {
   onClose: () => void;
@@ -21,6 +22,7 @@ export default function NewChatModal({ onClose, onConversationCreated }: Props) 
   const [searching, setSearching] = useState(false);
   const [loading, setLoading] = useState(false);
 
+  const { trackConversationCreated } = useAnalytics();
   const [selectedUsers, setSelectedUsers] = useState<UserPublic[]>([]);
   const [groupName, setGroupName] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -56,6 +58,7 @@ export default function NewChatModal({ onClose, onConversationCreated }: Props) 
           type: "direct",
           member_ids: [user.id],
         });
+        trackConversationCreated();
         onConversationCreated(data.id);
       } catch {
         toastError("Failed to create conversation");
@@ -83,6 +86,7 @@ export default function NewChatModal({ onClose, onConversationCreated }: Props) 
         member_ids: selectedUsers.map((u) => u.id),
       });
       // Optionally we'd upload an avatar here using the file input if we implemented form data
+      trackConversationCreated();
       onConversationCreated(data.id);
     } catch {
       toastError("Failed to create group");

@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { Search, HelpCircle, Lock, EyeOff, Bell, Vibrate, Palette, ChevronRight, PenLine } from "lucide-react";
+import { Search, HelpCircle, Lock, EyeOff, Bell, Vibrate, Palette, ChevronRight, PenLine, BarChart3 } from "lucide-react";
 import { useTheme } from "next-themes";
 import api from "@/lib/api";
 import { useAuthStore } from "@/lib/auth";
@@ -166,6 +166,17 @@ export default function SettingsPage() {
                   </button>
                 </div>
               }
+            />
+          </div>
+
+          <SectionTitle label="Insights" />
+          <div className="bg-surface-light dark:bg-surface-dark rounded-[16px] shadow-sm border border-neutral-100 dark:border-neutral-800 p-1">
+            <Row 
+              icon={<BarChart3 className="h-5 w-5" />}
+              title="Analytics"
+              subtitle="Messages sent, activity, storage & more"
+              right={<ChevronRight className="h-5 w-5 text-text-secondary" />}
+              onClick={() => router.push('/settings/analytics')}
             />
           </div>
           

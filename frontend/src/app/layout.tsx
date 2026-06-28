@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import Onboarding from "@/components/Onboarding";
 import "./globals.css";
+import "react-loading-skeleton/dist/skeleton.css";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -27,14 +29,16 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
+          <Onboarding />
           {children}
           <Toaster
-            position="top-center"
+            position="top-right"
             toastOptions={{
+              duration: 3000,
               style: {
-                background: "var(--bg-secondary)",
-                color: "var(--text-primary)",
-                border: "1px solid rgba(255,255,255,0.05)",
+                background: "#1a1a2e",
+                color: "#e0e0e0",
+                border: "1px solid rgba(255,255,255,0.08)",
                 fontSize: "13px",
               },
             }}

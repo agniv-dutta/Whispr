@@ -7,6 +7,8 @@ import { formatMessageTime, getMessageStatusIcon, getInitials } from "@/lib/form
 import { cn } from "@/lib/utils";
 import ImageMessage from "./ImageMessage";
 import FileMessage from "./FileMessage";
+import ContactCard from "./ContactCard";
+import { useLinkPreview, LinkPreviewCard } from "./LinkPreview";
 
 interface Props {
   message: ChatMessage;
@@ -91,6 +93,7 @@ export default function MessageBubble({ message, isGroup, onReplyClick, onReply 
   const [swiping, setSwiping]       = useState(0);
   const [contextMenu, setContextMenu] = useState<{ x: number; y: number } | null>(null);
   const touchStartRef = useRef(0);
+  const { preview: linkPreviewData } = useLinkPreview(!isOwn && message.content ? message.content : "");
 
   /* ── System message ──────────────────────── */
   if (message.type === "system") {
@@ -151,20 +154,38 @@ export default function MessageBubble({ message, isGroup, onReplyClick, onReply 
         {/* Group sender label + avatar */}
         {isGroup && !isOwn && (
           <div className="mb-0.5 flex items-center gap-2 pl-1">
-            {message.sender.avatar_url ? (
-              <img
-                src={message.sender.avatar_url}
-                alt=""
-                className="h-5 w-5 rounded-full object-cover"
-              />
-            ) : (
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20 text-[9px] font-bold text-primary">
-                {getInitials(message.sender.display_name)}
+            <ContactCard
+              userId={message.sender.id}
+              displayName={message.sender.display_name}
+              avatarUrl={message.sender.avatar_url}
+              bio={message.sender.bio}
+              isOnline={message.sender.is_online}
+              lastSeen={message.sender.last_seen}
+            >
+              {message.sender.avatar_url ? (
+                <img
+                  src={message.sender.avatar_url}
+                  alt=""
+                  className="h-5 w-5 rounded-full object-cover"
+                />
+              ) : (
+                <span className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20 text-[9px] font-bold text-primary">
+                  {getInitials(message.sender.display_name)}
+                </span>
+              )}
+            </ContactCard>
+            <ContactCard
+              userId={message.sender.id}
+              displayName={message.sender.display_name}
+              avatarUrl={message.sender.avatar_url}
+              bio={message.sender.bio}
+              isOnline={message.sender.is_online}
+              lastSeen={message.sender.last_seen}
+            >
+              <span className="text-[11px] font-semibold text-primary">
+                {message.sender.display_name}
               </span>
-            )}
-            <span className="text-[11px] font-semibold text-primary">
-              {message.sender.display_name}
-            </span>
+            </ContactCard>
           </div>
         )}
 
@@ -244,6 +265,11 @@ export default function MessageBubble({ message, isGroup, onReplyClick, onReply 
             <p className="text-[14px] leading-snug whitespace-pre-wrap break-words">
               {message.content}
             </p>
+          )}
+
+          {/* Link preview */}
+          {linkPreviewData && !isOwn && (
+            <LinkPreviewCard preview={linkPreviewData} />
           )}
 
           {/* Time + read receipt */}

@@ -7,7 +7,10 @@ import { useAuthStore } from "@/lib/auth";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import type { ChatMessage, Conversation } from "@/lib/types";
 import { getDateLabel } from "@/lib/format";
-import { toastError } from "@/lib/toast";
+import { toastError, toastSuccess } from "@/lib/toast";
+import { useSound } from "@/hooks/useSound";
+import { useAnalytics } from "@/lib/analytics";
+import { MessageSkeleton } from "@/components/Skeletons";
 import MessageBubble from "@/components/MessageBubble";
 import MessageInput from "@/components/MessageInput";
 import TypingIndicator from "@/components/TypingIndicator";
@@ -41,6 +44,8 @@ export default function ChatPage() {
   const prevScrollHeight = useRef(0);
   const initScrollDone = useRef(false);
   const typingTimers = useRef<Map<string, ReturnType<typeof setTimeout>>>(new Map());
+  const sound = useSound();
+  const { trackMessageSent, trackDeliveryTime } = useAnalytics();
 
   useEffect(() => {
     setIsMobile(window.innerWidth < 768);
@@ -59,6 +64,7 @@ export default function ChatPage() {
       setTimeout(() => setNotifBanner(null), 5000);
       return;
     }
+    sound.play();
     setMessages((prev) => {
       if (prev.find((m) => m.id === msg!.id)) return prev;
       return [...prev, msg as unknown as ChatMessage];
@@ -228,6 +234,7 @@ export default function ChatPage() {
     replyToId: string | null,
     attachment?: { url: string; file_type: string; file_size: number; file_name: string },
   ) => {
+    const start = performance.now();
     try {
       const body: Record<string, unknown> = { content, reply_to_id: replyToId };
       if (attachment) {
@@ -235,9 +242,12 @@ export default function ChatPage() {
         body.attachment = attachment;
       }
       await api.post(`/chats/${id}/messages`, body);
+      trackDeliveryTime(Math.round(performance.now() - start));
+      trackMessageSent();
       setReplyTo(null);
+      toastSuccess("Message sent");
     } catch {
-      toastError("Failed to send message. Check your connection.");
+      toastError("Failed to send message");
     }
   };
 
@@ -266,11 +276,8 @@ export default function ChatPage() {
 
   if (loading && messages.length === 0) {
     return (
-      <div className="flex h-full items-center justify-center">
-        <div className="flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
-          <p className="text-xs text-text-secondary">Loading messages…</p>
-        </div>
+      <div className="flex flex-col h-full">
+        <MessageSkeleton />
       </div>
     );
   }
