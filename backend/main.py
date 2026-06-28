@@ -10,7 +10,7 @@ from sqlalchemy import select
 
 from app.database import engine, Base, async_session
 from app.models import Conversation, Message
-from app.routers import auth, users, chats, conversations, websocket, upload
+from app.routers import auth, users, chats, conversations, websocket, upload, preview
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 logger = logging.getLogger("whispr")
@@ -83,6 +83,7 @@ app.include_router(chats.router, prefix="/api/chats", tags=["chats"])
 app.include_router(conversations.router, prefix="/api/conversations", tags=["conversations"])
 app.include_router(websocket.router, tags=["websocket"])
 app.include_router(upload.router, prefix="/api", tags=["upload"])
+app.include_router(preview.router, tags=["preview"])
 
 os.makedirs("uploads/avatars", exist_ok=True)
 os.makedirs("static/uploads", exist_ok=True)

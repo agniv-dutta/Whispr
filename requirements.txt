@@ -12,3 +12,4 @@ sentry-sdk
 pytest
 pytest-asyncio
 httpx
+beautifulsoup4

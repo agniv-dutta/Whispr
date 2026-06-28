@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+
 interface LinkPreviewData {
   title: string;
   description: string;
@@ -36,7 +38,7 @@ export function useLinkPreview(text: string) {
     let cancelled = false;
     setLoading(true);
 
-    fetch(`/api/preview?url=${encodeURIComponent(stripped)}`)
+    fetch(`${API_URL}/preview?url=${encodeURIComponent(stripped)}`)
       .then((r) => r.json().catch(() => null))
       .then((data) => {
         if (!cancelled && data) setPreview(data);
