@@ -170,7 +170,7 @@ export default function ChatPage() {
         return found ?? null;
       }).catch(() => null),
     ]);
-    setMessages(msgs);
+    setMessages(Array.isArray(msgs) ? msgs : []);
     setConversation(conv);
     setOtherOnline(conv?.other_user?.is_online ?? null);
     setHasMore(msgs.length >= PAGE_SIZE);

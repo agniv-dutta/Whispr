@@ -1,0 +1,47 @@
+2026-06-28 23:40:24,979 INFO whispr: Whispr API started
+INFO:     Started server process [9348]
+INFO:     Waiting for application startup.
+2026-06-28 23:40:24,992 INFO whispr: Database tables created
+INFO:     Application startup complete.
+INFO:     Uvicorn running on http://127.0.0.1:8765 (Press CTRL+C to quit)
+INFO:     127.0.0.1:60343 - "GET /health HTTP/1.1" 200 OK
+2026-06-28 23:40:42,324 INFO whispr.auth: Login attempt — phone=+919876543210 otp=123456
+2026-06-28 23:40:42,361 INFO whispr.auth: Found existing user Alex Chen (2908f8b1fd1b483a848ff8f50731c8d9)
+2026-06-28 23:40:42,375 INFO whispr.auth: Login success — token=eyJhbGciOiJIUzI1NiIs…
+INFO:     127.0.0.1:53539 - "POST /api/auth/login HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53539 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53539 - "GET /api/chats/4377a6710f6d42dd8cf94825b715e845/messages?limit=10 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52831 - "GET /api/chats/4377a6710f6d42dd8cf94825b715e845/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:52831 - "GET /api/chats/4377a6710f6d42dd8cf94825b715e845/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51846 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51846 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51846 - "PUT /api/chats/4377a6710f6d42dd8cf94825b715e845/read HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54951 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54951 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54951 - "OPTIONS /api/chats/46322e3aef9340b19643d431c77d1bcb/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54951 - "GET /api/chats/46322e3aef9340b19643d431c77d1bcb/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54951 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54951 - "GET /api/chats/46322e3aef9340b19643d431c77d1bcb/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54951 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:54951 - "OPTIONS /api/chats/46322e3aef9340b19643d431c77d1bcb/read HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51521 - "PUT /api/chats/46322e3aef9340b19643d431c77d1bcb/read HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62250 - "OPTIONS /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51154 - "OPTIONS /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51154 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51154 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51154 - "OPTIONS /api/chats/91d25275f32d451fb78a4c7aa1ee4452/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51154 - "GET /api/chats/91d25275f32d451fb78a4c7aa1ee4452/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62250 - "GET /api/chats/91d25275f32d451fb78a4c7aa1ee4452/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51154 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51154 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:51154 - "OPTIONS /api/chats/91d25275f32d451fb78a4c7aa1ee4452/read HTTP/1.1" 200 OK
+INFO:     127.0.0.1:62250 - "PUT /api/chats/91d25275f32d451fb78a4c7aa1ee4452/read HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58270 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58270 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58270 - "OPTIONS /api/chats/73174502fa6b449ebbb484952509c44e/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58270 - "GET /api/chats/73174502fa6b449ebbb484952509c44e/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58270 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58270 - "GET /api/chats/73174502fa6b449ebbb484952509c44e/messages?limit=50 HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58270 - "GET /api/conversations/ HTTP/1.1" 200 OK
+INFO:     127.0.0.1:58270 - "OPTIONS /api/chats/73174502fa6b449ebbb484952509c44e/read HTTP/1.1" 200 OK
+INFO:     127.0.0.1:57020 - "PUT /api/chats/73174502fa6b449ebbb484952509c44e/read HTTP/1.1" 200 OK

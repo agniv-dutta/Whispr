@@ -3,6 +3,7 @@ import datetime
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
+from sqlalchemy.orm import selectinload
 
 from app.database import get_db
 from app.models import (
@@ -99,7 +100,11 @@ async def get_messages(
     if not membership.scalar_one_or_none():
         raise HTTPException(status_code=403, detail="Not a member")
 
-    q = select(Message).where(Message.conversation_id == conversation_id)
+    q = (
+        select(Message)
+        .options(selectinload(Message.attachments), selectinload(Message.statuses))
+        .where(Message.conversation_id == conversation_id)
+    )
 
     if before:
         before_msg = await db.get(Message, before)

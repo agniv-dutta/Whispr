@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { Toaster } from "sonner";
 import { ThemeProvider } from "@/components/ThemeProvider";
-import Onboarding from "@/components/Onboarding";
 import "./globals.css";
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -29,7 +28,6 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col">
         <ThemeProvider>
-          <Onboarding />
           {children}
           <Toaster
             position="top-right"

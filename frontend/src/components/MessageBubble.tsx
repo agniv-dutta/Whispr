@@ -202,7 +202,7 @@ export default function MessageBubble({ message, isGroup, onReplyClick, onReply 
             "transition-transform duration-150",
             isOwn
               ? "bg-primary text-white rounded-br-[4px]"
-              : "bg-neutral-100 dark:bg-neutral-800 text-text-primary dark:text-text-invert rounded-bl-[4px]"
+              : "bg-neutral-100 dark:bg-neutral-800 text-white rounded-bl-[4px]"
           )}
         >
           {/* Swipe-to-reply indicator */}
@@ -235,7 +235,7 @@ export default function MessageBubble({ message, isGroup, onReplyClick, onReply 
               <span className={cn("text-[11px] font-semibold", isOwn ? "text-white/90" : "text-primary")}>
                 {message.reply_to.sender_name}
               </span>
-              <span className={cn("line-clamp-1 text-[12px]", isOwn ? "text-white/70" : "text-text-secondary")}>
+              <span className={cn("line-clamp-1 text-[12px]", isOwn ? "text-white/70" : "text-white/70")}>
                 {message.reply_to.type === "image" ? "📷 Photo" : message.reply_to.content}
               </span>
             </button>
@@ -276,7 +276,7 @@ export default function MessageBubble({ message, isGroup, onReplyClick, onReply 
           <div className="mt-0.5 flex items-center justify-end gap-1">
             <span className={cn(
               "text-[10px] leading-none",
-              isOwn ? "text-white/60" : "text-text-secondary"
+              isOwn ? "text-white/60" : "text-white/60"
             )}>
               {formatMessageTime(message.created_at)}
             </span>
