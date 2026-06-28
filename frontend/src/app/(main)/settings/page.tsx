@@ -2,218 +2,181 @@
 
 import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, User, Bell, Shield, Moon, Monitor, Smartphone, Phone, HelpCircle, ChevronRight, Camera } from "lucide-react";
+import { Search, HelpCircle, Lock, EyeOff, Bell, Vibrate, Palette, ChevronRight, PenLine } from "lucide-react";
 import { useTheme } from "next-themes";
 import api from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import { useAuthStore } from "@/lib/auth";
 import { toastError } from "@/lib/toast";
+import { cn } from "@/lib/utils";
 
 export default function SettingsPage() {
   const router = useRouter();
-  const { user, setUser, logout } = useAuth();
+  const { user, setUser, logout } = useAuthStore();
   const { theme, setTheme, resolvedTheme } = useTheme();
-  const [displayName, setDisplayName] = useState(user?.display_name ?? "");
-  const [bio, setBio] = useState(user?.bio ?? "");
-  const [editing, setEditing] = useState(false);
-  const [saving, setSaving] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  const currentTheme = resolvedTheme ?? "light";
 
-  const handleSave = async () => {
-    if (!displayName.trim()) return;
-    setSaving(true);
-    try {
-      const { data } = await api.put("/users/me", {
-        display_name: displayName.trim(),
-        bio: bio.trim() || null,
-      });
-      setUser(data);
-      setEditing(false);
-    } catch {
-      toastError("Failed to save profile");
-    }
-    setSaving(false);
-  };
-
-  const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const form = new FormData();
-    form.append("avatar", file);
-    try {
-      const { data } = await api.put("/users/me/avatar", form, {
-        headers: { "Content-Type": "multipart/form-data" },
-      });
-      setUser(data);
-    } catch {
-      toastError("Failed to upload avatar");
-    }
-  };
-
-  const currentTheme = resolvedTheme ?? "dark";
-
-  const Section = ({ label, children }: { label: string; children: React.ReactNode }) => (
-    <div className="mt-6 first:mt-0">
-      <p className="mb-1 px-4 text-[11px] font-semibold uppercase tracking-wider text-foreground/40">
-        {label}
-      </p>
-      <div className="bg-sidebar">{children}</div>
-    </div>
+  const SectionTitle = ({ label }: { label: string }) => (
+    <h3 className="mt-8 mb-3 px-1 text-[11px] font-bold tracking-widest text-primary uppercase">
+      {label}
+    </h3>
   );
 
   const Row = ({
     icon,
-    label,
-    sub,
-    onClick,
+    title,
+    subtitle,
     right,
+    onClick
   }: {
     icon: React.ReactNode;
-    label: string;
-    sub?: string;
-    onClick?: () => void;
+    title: string;
+    subtitle: string;
     right?: React.ReactNode;
+    onClick?: () => void;
   }) => (
-    <button
+    <div 
       onClick={onClick}
-      className="flex w-full items-center gap-3 px-4 py-3.5 text-left transition-colors hover:bg-white/[0.03] disabled:opacity-50"
-      disabled={!onClick}
+      className={cn(
+        "flex items-center gap-4 px-4 py-4 rounded-xl transition-colors",
+        onClick ? "cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800/50" : ""
+      )}
     >
-      <span className="shrink-0 text-foreground/40">{icon}</span>
-      <div className="min-w-0 flex-1">
-        <div className="text-sm text-foreground">{label}</div>
-        {sub && <div className="text-[11px] text-foreground/40">{sub}</div>}
+      <div className="shrink-0 text-text-secondary">{icon}</div>
+      <div className="flex-1 min-w-0">
+        <h4 className="text-[15px] font-bold text-text-primary dark:text-text-invert">{title}</h4>
+        <p className="text-[13px] text-text-secondary mt-0.5">{subtitle}</p>
       </div>
-      {right || (onClick && <ChevronRight className="h-4 w-4 shrink-0 text-foreground/20" />)}
+      {right && <div className="shrink-0 ml-2">{right}</div>}
+    </div>
+  );
+
+  const CustomToggle = ({ checked, onChange }: { checked: boolean, onChange: () => void }) => (
+    <button 
+      onClick={onChange}
+      className={cn("w-[42px] h-6 rounded-full flex items-center transition-colors px-0.5", checked ? "bg-primary" : "bg-neutral-200 dark:bg-neutral-700")}
+    >
+      <div className={cn("bg-white h-[20px] w-[20px] rounded-full shadow-sm transition-transform duration-200", checked ? "translate-x-[18px]" : "translate-x-0")} />
     </button>
   );
 
   return (
-    <div className="flex h-full flex-col">
-      <header className="flex h-16 items-center gap-3 border-b border-white/5 px-4">
-        <button onClick={() => router.back()} className="text-foreground/60 hover:text-foreground">
-          <ArrowLeft className="h-5 w-5" />
-        </button>
-        <h1 className="text-base font-semibold text-foreground">Settings</h1>
+    <div className="flex h-full flex-col bg-bg-light dark:bg-bg-dark">
+      {/* Header */}
+      <header className="flex h-16 items-center justify-between px-6 shrink-0">
+        <h1 className="text-[20px] font-bold text-primary">Settings</h1>
+        <div className="flex items-center gap-4">
+          <button className="text-text-secondary hover:text-text-primary transition-colors">
+            <Search className="h-5 w-5" />
+          </button>
+          <button className="text-text-secondary hover:text-text-primary transition-colors">
+            <HelpCircle className="h-5 w-5" />
+          </button>
+        </div>
       </header>
 
-      <div className="flex-1 overflow-y-auto py-4">
-        <Section label="Profile">
-          <div className="flex items-center gap-4 px-4 py-4">
-            <button
-              onClick={() => fileInputRef.current?.click()}
-              className="relative h-16 w-16 shrink-0"
-            >
-              {user?.avatar_url ? (
-                <img src={user.avatar_url} alt="" className="h-16 w-16 rounded-full object-cover" />
-              ) : (
-                <span className="flex h-16 w-16 items-center justify-center rounded-full bg-background text-lg font-semibold text-foreground/60">
-                  {(user?.display_name ?? "U").charAt(0).toUpperCase()}
-                </span>
-              )}
-              <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 transition-opacity hover:opacity-100">
-                <Camera className="h-5 w-5 text-white" />
+      <div className="flex-1 overflow-y-auto px-6 pb-12">
+        {/* Profile Card */}
+        <div className="bg-surface-light dark:bg-surface-dark rounded-[24px] p-8 flex flex-col items-center mt-4 shadow-sm border border-neutral-100 dark:border-neutral-800">
+          <div className="relative mb-4">
+            {user?.avatar_url ? (
+              <img src={user.avatar_url} alt="" className="h-24 w-24 rounded-full object-cover shadow-md" />
+            ) : (
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-3xl font-bold text-primary shadow-md">
+                {(user?.display_name ?? "U").charAt(0).toUpperCase()}
               </div>
+            )}
+            <button className="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-primary text-white flex items-center justify-center border-2 border-surface-light dark:border-surface-dark hover:bg-[#E65A1E] transition-colors">
+              <PenLine className="h-4 w-4" />
             </button>
-            <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarUpload} />
-            <div className="min-w-0 flex-1">
-              {editing ? (
-                <div className="space-y-2">
-                  <input
-                    value={displayName}
-                    onChange={(e) => setDisplayName(e.target.value)}
-                    placeholder="Display name"
-                    className="w-full rounded-lg bg-background px-3 py-2 text-sm text-foreground outline-none ring-1 ring-white/10 focus:ring-accent"
-                  />
-                  <input
-                    value={bio}
-                    onChange={(e) => setBio(e.target.value)}
-                    placeholder="Bio (optional)"
-                    className="w-full rounded-lg bg-background px-3 py-2 text-sm text-foreground outline-none ring-1 ring-white/10 focus:ring-accent"
-                  />
-                  <div className="flex gap-2">
-                    <button
-                      onClick={handleSave}
-                      disabled={saving || !displayName.trim()}
-                      className="rounded-lg bg-accent px-3 py-1.5 text-xs font-semibold text-black disabled:opacity-40"
-                    >
-                      {saving ? "Saving..." : "Save"}
-                    </button>
-                    <button
-                      onClick={() => { setEditing(false); setDisplayName(user?.display_name ?? ""); setBio(user?.bio ?? ""); }}
-                      className="rounded-lg px-3 py-1.5 text-xs text-foreground/40"
-                    >
-                      Cancel
-                    </button>
-                  </div>
-                </div>
-              ) : (
-                <button onClick={() => setEditing(true)} className="w-full text-left">
-                  <div className="text-sm font-medium text-foreground">
-                    {user?.display_name || "Your name"}
-                  </div>
-                  {user?.bio && <div className="text-xs text-foreground/40 mt-0.5">{user.bio}</div>}
-                  <div className="mt-1 text-[11px] text-accent">Edit profile</div>
-                </button>
-              )}
-            </div>
           </div>
-          <Row
-            icon={<Shield className="h-5 w-5" />}
-            label="Phone"
-            sub={user?.phone ?? ""}
-          />
-        </Section>
+          
+          <h2 className="text-[22px] font-bold text-text-primary dark:text-text-invert">
+            {user?.display_name || "Your name"}
+          </h2>
+          <p className="text-[14px] text-text-secondary mt-1">
+            @{(user?.display_name || "").toLowerCase().replace(/\s+/g, '_')}_24
+          </p>
 
-        <Section label="Privacy">
-          <Row icon={<Shield className="h-5 w-5" />} label="Privacy settings" sub="Last seen, profile photo, about" />
-        </Section>
-
-        <Section label="Notifications">
-          <Row icon={<Bell className="h-5 w-5" />} label="Notification settings" sub="Message, group & call notifications" />
-        </Section>
-
-        <Section label="Appearance">
-          <Row
-            icon={currentTheme === "dark" ? <Moon className="h-5 w-5" /> : <Monitor className="h-5 w-5" />}
-            label="Theme"
-            sub={currentTheme === "dark" ? "Dark" : "Light"}
-            onClick={() => setTheme(currentTheme === "dark" ? "light" : "dark")}
-            right={
-              <button
-                onClick={(e) => { e.stopPropagation(); setTheme(currentTheme === "dark" ? "light" : "dark"); }}
-                className={`relative h-6 w-10 rounded-full transition-colors ${currentTheme === "dark" ? "bg-accent" : "bg-white/20"}`}
-              >
-                <span
-                  className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${currentTheme === "dark" ? "translate-x-[18px]" : "translate-x-0.5"}`}
-                />
-              </button>
-            }
-          />
-        </Section>
-
-        <Section label="Devices">
-          <Row
-            icon={<Smartphone className="h-5 w-5" />}
-            label="Linked devices"
-            sub="Coming soon"
-          />
-        </Section>
-
-        <Section label="Calls">
-          <Row icon={<Phone className="h-5 w-5" />} label="Call settings" sub="Configure call preferences" />
-        </Section>
-
-        <Section label="Help">
-          <Row icon={<HelpCircle className="h-5 w-5" />} label="Help" sub="FAQ, contact support" />
-        </Section>
-
-        <div className="px-4 py-6">
-          <button
-            onClick={() => { logout(); router.push("/login"); }}
-            className="w-full rounded-xl bg-red-500/10 py-3 text-sm font-medium text-red-400 transition-colors hover:bg-red-500/20"
-          >
-            Logout
+          <button className="mt-6 px-6 py-2 rounded-xl border border-primary text-[14px] font-bold text-primary hover:bg-primary/5 transition-colors">
+            Edit Public Profile
           </button>
+        </div>
+
+        {/* Settings Sections */}
+        <div className="mt-4">
+          <SectionTitle label="Privacy & Security" />
+          <div className="bg-surface-light dark:bg-surface-dark rounded-[16px] shadow-sm border border-neutral-100 dark:border-neutral-800 p-1">
+            <Row 
+              icon={<Lock className="h-5 w-5" />}
+              title="End-to-End Encryption"
+              subtitle="Manage your unique encryption keys"
+              right={<ChevronRight className="h-5 w-5 text-text-secondary" />}
+              onClick={() => {}}
+            />
+            <Row 
+              icon={<EyeOff className="h-5 w-5" />}
+              title="Read Receipts"
+              subtitle="Others can see when you've read messages"
+              right={<CustomToggle checked={true} onChange={() => {}} />}
+            />
+          </div>
+
+          <SectionTitle label="Notifications" />
+          <div className="bg-surface-light dark:bg-surface-dark rounded-[16px] shadow-sm border border-neutral-100 dark:border-neutral-800 p-1">
+            <Row 
+              icon={<Bell className="h-5 w-5" />}
+              title="Desktop Notifications"
+              subtitle="Receive alerts while app is in background"
+              right={<CustomToggle checked={true} onChange={() => {}} />}
+            />
+            <Row 
+              icon={<Vibrate className="h-5 w-5" />}
+              title="Sound & Haptics"
+              subtitle="Play sounds for incoming messages"
+              right={<CustomToggle checked={false} onChange={() => {}} />}
+            />
+          </div>
+
+          <SectionTitle label="Appearance" />
+          <div className="bg-surface-light dark:bg-surface-dark rounded-[16px] shadow-sm border border-neutral-100 dark:border-neutral-800 p-1">
+            <Row 
+              icon={<Palette className="h-5 w-5" />}
+              title="Theme Mode"
+              subtitle="Switch between light and dark modes"
+              right={
+                <div className="flex p-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg">
+                  <button 
+                    onClick={() => setTheme("light")}
+                    className={cn(
+                      "px-4 py-1.5 text-[12px] font-bold rounded-md transition-colors",
+                      currentTheme === "light" ? "bg-surface-light text-text-primary shadow-sm" : "text-text-secondary"
+                    )}
+                  >
+                    Light
+                  </button>
+                  <button 
+                    onClick={() => setTheme("dark")}
+                    className={cn(
+                      "px-4 py-1.5 text-[12px] font-bold rounded-md transition-colors",
+                      currentTheme === "dark" ? "bg-surface-dark text-text-invert shadow-sm" : "text-text-secondary"
+                    )}
+                  >
+                    Dark
+                  </button>
+                </div>
+              }
+            />
+          </div>
+          
+          <div className="mt-8 px-1">
+             <button
+              onClick={() => { logout(); router.push("/login"); }}
+              className="w-full rounded-xl bg-error/10 py-3.5 text-[14px] font-bold text-error transition-colors hover:bg-error/20"
+            >
+              Log Out
+            </button>
+          </div>
         </div>
       </div>
     </div>

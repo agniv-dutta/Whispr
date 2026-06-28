@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
-import { useAuth } from "@/lib/auth";
+import { useAuthStore } from "@/lib/auth";
 import { WhisprSocket } from "@/lib/websocket";
 
 interface UseWebSocketOptions {
@@ -49,7 +49,7 @@ export function useWebSocket({
   sendTypingStop: (conversationId: string) => void;
   connected: boolean;
 } {
-  const { token } = useAuth();
+  const { token } = useAuthStore();
   const socketRef = useRef<WhisprSocket | null>(null);
 
   const subscribe = useCallback((conversationId: string) => {

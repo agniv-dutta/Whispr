@@ -4,12 +4,12 @@ import { useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Camera, Phone } from "lucide-react";
 import api from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import { useAuthStore } from "@/lib/auth";
 import { toastError } from "@/lib/toast";
 
 export default function ProfilePage() {
   const router = useRouter();
-  const { user, setUser } = useAuth();
+  const { user, setUser } = useAuthStore();
   const [displayName, setDisplayName] = useState(user?.display_name ?? "");
   const [bio, setBio] = useState(user?.bio ?? "");
   const [saving, setSaving] = useState(false);

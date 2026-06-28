@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { User, Camera, ArrowLeft } from "lucide-react";
 import api from "@/lib/api";
-import { useAuth } from "@/lib/auth";
+import { useAuthStore } from "@/lib/auth";
+import type { User as AuthUser } from "@/lib/auth";
 
 const COUNTRIES = [
   { code: "+91", label: "IN" },
@@ -19,7 +20,7 @@ const COUNTRIES = [
 
 export default function RegisterPage() {
   const router = useRouter();
-  const { setAuth } = useAuth();
+  const { setToken, setUser } = useAuthStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [step, setStep] = useState<"phone" | "otp" | "profile">("phone");
@@ -71,10 +72,10 @@ export default function RegisterPage() {
     try {
       const { data } = await api.post("/auth/register", {
         phone: fullPhone,
-        display_name: displayName.trim(),
         otp: otp.join(""),
       });
-      setAuth(data.access_token, data.user);
+      setToken(data.access_token);
+      setUser(data.user as AuthUser);
 
       if (avatarFile) {
         const form = new FormData();

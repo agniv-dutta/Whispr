@@ -1,40 +1,35 @@
-import { create } from "zustand";
-import { persist } from "zustand/middleware";
-import { WhisprSocket } from "./websocket";
+import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface User {
   id: string;
   phone: string;
-  username: string | null;
   display_name: string;
   avatar_url: string | null;
   bio: string | null;
-  last_seen: string | null;
-  is_online: boolean;
-  created_at: string;
+  username: string | null;
 }
 
 interface AuthState {
-  token: string | null;
   user: User | null;
-  setAuth: (token: string, user: User) => void;
+  token: string | null;
   setUser: (user: User) => void;
+  setToken: (token: string) => void;
   logout: () => void;
 }
 
-export const useAuth = create<AuthState>()(
+export const useAuthStore = create<AuthState>()(
   persist(
     (set) => ({
-      token: null,
       user: null,
-      setAuth: (token, user) => set({ token, user }),
+      token: null,
       setUser: (user) => set({ user }),
-      logout: () => {
-        WhisprSocket.resetInstance();
-        localStorage.removeItem("whispr-auth");
-        set({ token: null, user: null });
-      },
+      setToken: (token) => set({ token }),
+      logout: () => set({ user: null, token: null }),
     }),
-    { name: "whispr-auth" },
-  ),
+    {
+      name: 'auth-storage',
+      storage: createJSONStorage(() => localStorage),
+    }
+  )
 );

@@ -2,52 +2,165 @@
 
 @theme inline {
   --font-sans: var(--font-inter);
-  --color-accent: var(--accent);
-  --color-sent-bubble: var(--bubble-sent);
-  --color-received-bubble: var(--bubble-received);
+  --font-mono: var(--font-plex-mono), monospace;
+
+  /* ─── Primary Palette ─── */
+  --color-primary: var(--primary);
+  --color-secondary: var(--secondary);
+  --color-tertiary: var(--tertiary);
+
+  /* ─── Surfaces ─── */
+  --color-bg-light: var(--bg-light);
+  --color-bg-dark: var(--bg-dark);
+  --color-surface-light: var(--surface-light);
+  --color-surface-dark: var(--surface-dark);
   --color-sidebar: var(--bg-sidebar);
   --color-background: var(--bg-primary);
   --color-foreground: var(--text-primary);
+
+  /* ─── Text ─── */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-invert: var(--text-invert);
+
+  /* ─── Semantic ─── */
+  --color-success: var(--success);
+  --color-error: var(--error);
+  --color-warning: var(--warning);
+
+  /* ─── Neutral Scale ─── */
+  --color-neutral-50: #FAFBFC;
+  --color-neutral-100: #F3F4F6;
+  --color-neutral-200: #E5E7EB;
+  --color-neutral-400: #9CA3AF;
+  --color-neutral-600: #6B7280;
+  --color-neutral-800: #1F2937;
+  --color-neutral-900: #111827;
+
+  /* ─── Bubble aliases ─── */
+  --color-sent-bubble: var(--bubble-sent);
+  --color-received-bubble: var(--bubble-received);
+
+  /* ─── Accent alias (backwards compat) ─── */
+  --color-accent: var(--primary);
+
+  /* ─── Border radius ─── */
+  --radius-input: 12px;
+  --radius-button: 12px;
+  --radius-bubble: 16px;
+
+  /* ─── Shadows ─── */
+  --shadow-light: 0 1px 3px rgba(0, 0, 0, 0.12);
+  --shadow-medium: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-dark: 0 10px 25px rgba(0, 0, 0, 0.15);
 }
 
+/* ───────────────────────────────────────────
+   LIGHT MODE – Warm Energy Palette
+─────────────────────────────────────────── */
 :root {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f0f2f5;
-  --bg-sidebar: #ffffff;
-  --bubble-sent: #d9fdd3;
-  --bubble-received: #ffffff;
-  --text-primary: #111b21;
-  --text-secondary: #667781;
-  --accent: #00a884;
-  --status-teal: #00a884;
-  --status-gray: #8796a0;
-  --scrollbar-bg: transparent;
-  --scrollbar-thumb: #c1c7cd;
+  /* Brand */
+  --primary:        #FF6B35;
+  --secondary:      #004E89;
+  --tertiary:       #F7B801;
+
+  /* Backgrounds */
+  --bg-light:       #FAFBFC;
+  --bg-dark:        #0F1419;
+  --bg-primary:     #FAFBFC;
+  --bg-secondary:   #F3F4F6;
+  --bg-sidebar:     #FFFFFF;
+  --surface-light:  #FFFFFF;
+  --surface-dark:   #1F2937;
+
+  /* Text */
+  --text-primary:   #1A1A2E;
+  --text-secondary: #6B7280;
+  --text-invert:    #E5E7EB;
+
+  /* Semantic */
+  --success:        #10B981;
+  --error:          #EF4444;
+  --warning:        #FBBF24;
+
+  /* Bubbles */
+  --bubble-sent:    #21609E;
+  --bubble-received:#F3F4F6;
+
+  /* Scrollbar */
+  --scrollbar-bg:   transparent;
+  --scrollbar-thumb:#D1D5DB;
 }
 
+/* ───────────────────────────────────────────
+   DARK MODE – Warm Energy Dark Palette
+─────────────────────────────────────────── */
 .dark {
-  --bg-primary: #0b141a;
-  --bg-secondary: #111b21;
-  --bg-sidebar: #111b21;
-  --bubble-sent: #005c4b;
-  --bubble-received: #202c33;
-  --text-primary: #e9edef;
-  --text-secondary: #8696a0;
-  --accent: #00a884;
-  --status-teal: #00a884;
-  --status-gray: #8796a0;
-  --scrollbar-bg: transparent;
-  --scrollbar-thumb: #374045;
+  /* Backgrounds */
+  --bg-primary:     #0F1419;
+  --bg-secondary:   #1F2937;
+  --bg-sidebar:     #111827;
+  --surface-light:  #1F2937;
+  --surface-dark:   #111827;
+
+  /* Text */
+  --text-primary:   #E5E7EB;
+  --text-secondary: #9CA3AF;
+  --text-invert:    #1A1A2E;
+
+  /* Bubbles */
+  --bubble-sent:    #D94E12;
+  --bubble-received:#1F2937;
+
+  /* Scrollbar */
+  --scrollbar-bg:   transparent;
+  --scrollbar-thumb:#374151;
 }
 
+/* ───────────────────────────────────────────
+   BASE STYLES & TYPOGRAPHY
+─────────────────────────────────────────── */
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: var(--font-inter), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
+/* Typography Utilities (from design system) */
+@layer utilities {
+  .text-display-lg {
+    font-size: 32px;
+    line-height: 1.2;
+    font-weight: 900;
+  }
+  .text-heading-md {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 700;
+  }
+  .text-body-md {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+  .text-caption {
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 500;
+  }
+  .text-mono-label {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.2;
+    font-weight: 400;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 5px;
 }
 ::-webkit-scrollbar-track {
   background: var(--scrollbar-bg);
@@ -55,4 +168,14 @@ body {
 ::-webkit-scrollbar-thumb {
   background: var(--scrollbar-thumb);
   border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--primary);
+  opacity: 0.6;
+}
+
+/* Focus ring */
+:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 2px;
 }

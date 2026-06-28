@@ -1,86 +1,66 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { useRouter, usePathname } from "next/navigation";
-import { useAuth } from "@/lib/auth";
-import ConversationList from "@/components/ConversationList";
+import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
+import { useAuthStore } from '@/lib/auth';
+import apiClient from '@/lib/api';
+import type { Conversation } from '@/lib/types';
+import Sidebar from '@/components/Sidebar';
+import ConversationList from '@/components/ConversationList';
+import SearchBar from '@/components/SearchBar';
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
-  const router = useRouter();
-  const pathname = usePathname();
-  const { token } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-
-  const isChat = pathname.startsWith("/chat/");
-  const activeId = isChat ? pathname.split("/chat/")[1] : null;
-  const isRoot = pathname === "/";
+/**
+ * Main shell layout – 3-panel structure:
+ *
+ * ┌──────────┬────────────────┬──────────────────────────┐
+ * │  Sidebar │  Convs panel  │  children (chat pane)    │
+ * │  260px   │    320px       │        flex-1            │
+ * └──────────┴────────────────┴──────────────────────────┘
+ */
+export default function MainLayout({ children }: { children: React.ReactNode }) {
+  const token   = useAuthStore((s) => s.token);
+  const router  = useRouter();
+  const [mounted, setMounted]         = useState(false);
+  const [conversations, setConversations] = useState<Conversation[]>([]);
 
   useEffect(() => {
-    if (!token) {
-      router.replace("/login");
-    }
+    setMounted(true);
+    if (!token) router.push('/login');
   }, [token, router]);
 
-  const checkMobile = useCallback(() => {
-    setIsMobile(window.innerWidth < 768);
-  }, []);
-
   useEffect(() => {
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-    return () => window.removeEventListener("resize", checkMobile);
-  }, [checkMobile]);
+    if (!token) return;
+    apiClient.get('/conversations')
+      .then((r) => setConversations(r.data))
+      .catch(() => {});
+  }, [token]);
 
-  const handleSelect = (id: string) => {
+  const handleSelect = useCallback((id: string) => {
     router.push(`/chat/${id}`);
-    if (isMobile) setSidebarOpen(false);
-  };
+  }, [router]);
 
-  if (!token) return null;
+  if (!mounted) return null;
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
-      <div
-        className={`flex flex-col border-r border-white/5 bg-background ${
-          isMobile
-            ? sidebarOpen
-              ? "w-full"
-              : "hidden"
-            : "w-[360px] shrink-0"
-        }`}
-      >
-        <ConversationList
-          activeId={activeId}
+    <div className="flex h-screen bg-bg-light dark:bg-bg-dark overflow-hidden">
+      {/* ── 1. Nav sidebar (brand + icons) ───── */}
+      <Sidebar />
+
+      {/* ── 2. Conversation list panel ────────── */}
+      <div className="w-[320px] shrink-0 flex flex-col bg-surface-light dark:bg-surface-dark border-r border-neutral-200 dark:border-neutral-800 overflow-hidden">
+        <SearchBar
+          conversations={conversations}
           onSelect={handleSelect}
-          onCloseMobile={() => isMobile && setSidebarOpen(false)}
+          onCloseMobile={() => {}}
         />
+        <div className="flex-1 overflow-y-auto">
+          <ConversationList />
+        </div>
       </div>
 
-      <div
-        className={`flex flex-1 flex-col ${
-          isMobile && !sidebarOpen ? "w-full" : "hidden md:flex"
-        }`}
-      >
-        {isRoot && !activeId ? (
-          <div className="flex flex-1 items-center justify-center">
-            <div className="text-center">
-              <div className="mb-4 text-6xl">💬</div>
-              <h2 className="text-xl font-semibold text-foreground/60">
-                Whispr
-              </h2>
-              <p className="mt-1 text-sm text-foreground/30">
-                Select a conversation to start chatting
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="flex-1">{children}</div>
-        )}
+      {/* ── 3. Main content area ──────────────── */}
+      <div className="flex-1 flex overflow-hidden min-w-0">
+        {children}
       </div>
     </div>
   );
